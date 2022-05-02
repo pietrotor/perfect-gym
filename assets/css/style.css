@@ -1,0 +1,45 @@
+:root{
+  --dark:#16191c;
+  --dark-x:#1e2126;
+  --light:#ffffff;
+}
+body{
+  font-family: 'Spartan', sans-serif;
+  font-weight: 300;
+  color: var(--light) !important;
+}
+.bg-dark{
+  background-color: var(--dark)!important;
+}
+.bg-dark-x{
+  background-color: var(--dark-x);
+}
+.form-control,.btn{
+  min-height: 3.125rem;
+  line-height: initial;
+}
+.img-1{
+  background: url('https://legismusic.com/wp-content/uploads/2018/06/musica-de-fondo-cadena-de-gimnasios-fitness.jpg');
+  background-size: cover;
+  background-position: center center;
+  object-fit: cover;
+}
+.img-2{
+  background: url('https://i.pinimg.com/originals/a0/66/2f/a0662faec0231215e9b716e0058406f2.jpg');
+  background-size: cover;
+  background-position: center center;
+  object-fit: cover;
+}
+.img-3{
+  background: url('https://tickets.goline.es/wp-content/uploads/2018/03/oferta-3.jpg');
+  background-size: cover;
+  background-position: center center;
+  object-fit: cover;
+}
+#formulario input{
+  color: var(--light);
+}
+#formulario input:focus{
+  background-color: var(--dark-x);
+
+}
