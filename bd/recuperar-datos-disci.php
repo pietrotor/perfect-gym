@@ -33,6 +33,7 @@ $opc_recu=(isset($_POST['opc_recu'])) ? $_POST['opc_recu'] : '';
             $return1 = array ('denominacion' => $row['denominacion'],'hora_inicio' => $row['hora_inicio'],
             'hora_fin' => $row['hora_fin'],'precio' => $row['precio'],
             'sesiones' => $row['sesiones'],'tiempo_limite' => $row['tiempo_limite'],
+            'limitar_cupos' => $row['limitar_cupos'],'maximo_cupo' => $row['maximo_cupo'],
             'id_instructor' => $row['id_instructor'], 'id_sala' => $row['id_sala']);                               
         }
       }  

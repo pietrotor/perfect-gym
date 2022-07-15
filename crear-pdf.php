@@ -65,7 +65,9 @@ $consulta = "SELECT  num_clases,fecha_membresia,fecha_end_membresia,id_grupo,id 
     $data2=$resultado->fetchAll(PDO::FETCH_ASSOC); 
     if($data2){
         foreach($data2 as $row){
-          $datos_empresa=array('direccion'=>$row['direccion'], 'ciudad'=>$row['ciudad'], 'pais'=>$row['pais'], 'razon_social'=>$row['razon_social']);
+          $datos_empresa=array('direccion'=>$row['direccion'], 'ciudad'=>$row['ciudad'], 'pais'=>$row['pais'], 'razon_social'=>$row['razon_social'],
+                               'asunto'=>$row['asunto_inscripcion_email'], 'cuerpo'=>$row['cuerpo_inscripcion_email'], 'alt'=>$row['alt_inscripcion_email'],
+                               'link'=>$row['link_inscripcion_email'], 'texto'=>$row['texto_boton_email']);
         }
     }
     
@@ -190,7 +192,12 @@ $enquirydata=[
   'nombre'=>$datos_finales['nombre'],
   'apellido'=>$datos_finales['apellido'],
   'correo'=>$datos_finales['correo'],
-  'id_membresia'=>$datos_finales['id_membresia']
+  'id_membresia'=>$datos_finales['id_membresia'],
+  'asunto'=>$datos_finales['asunto'],
+  'cuerpo'=>$datos_finales['cuerpo'],
+  'alt'=>$datos_finales['alt'],
+  'link'=>$datos_finales['link'],
+  'texto'=>$datos_finales['texto']
 ];
 
 
@@ -214,9 +221,9 @@ $cuerpocorreo='<!DOCTYPE html>
 
 <!--Copia desde aquí-->
 <table style="max-width: 600px; padding: 10px; margin:0 auto; border-collapse: collapse;">
-	<tr>
+	<tr style="background-color: #147992">
 		<td style="background-color: #ecf0f1; text-align: left; padding: 0">
-			<a href="https://www.facebook.com/PokemonTrujillo/">
+			<a href='.$enquirydata['link'].' style="display: flex; justify-content: center;">
 				<img width="20%" style="display:block; margin: 1.5% 3%" src="cid:logo_empresa">
 			</a>
 		</td>
@@ -227,11 +234,10 @@ $cuerpocorreo='<!DOCTYPE html>
 			<div style="color: #34495e; margin: 4% 10% 2%; text-align: justify;font-family: sans-serif">
 				<h2 style="color: #3498DB; margin: 0 0 7px">Hola '.$enquirydata['nombre'].'!</h2>
 				<p style="margin: 2px; font-size: 15px">
-					Te queremos agradecer por la confianza que depositaste en nosotros y haremos todo lo posible para poder brindarte el mejor servicio posible.<br>
-          Confiamos en que alcanzara sus objetivos trazados y esperamos seguir siendo participes de sus exitos.<br>
-          Te envíamos tu comprobante de inscripción, saludos.<br></p><br>				
+            '.$enquirydata['cuerpo'].'
+          <br></p><br>				
 				<div style="width: 100%; text-align: center">
-					<a style="text-decoration: none; border-radius: 5px; padding: 11px 23px; color: white; background-color: #3498db" href="https://www.facebook.com/fitco.community/">Visita nuestra pagina de Facebook</a>	
+					<a style="text-decoration: none; border-radius: 5px; padding: 11px 23px; color: white; background-color: #3498db" href='.$enquirydata['link'].'>'.$enquirydata['texto'].'</a>	
 				</div>
 				<p style="color: #b3b3b3; font-size: 12px; text-align: center;margin: 30px 0 0">'.$enquirydata['razon_social'].' '.date("Y").'</p>
 			</div>
@@ -270,9 +276,9 @@ try {
 
     // Content
     $mail->isHTML(true);                                  // Set email format to HTML
-    $mail->Subject = 'Comprobante de Inscripcion';
+    $mail->Subject = $enquirydata['asunto'];
     $mail->Body    = $cuerpocorreo;
-    $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+    $mail->AltBody = $enquirydata['alt'];
     $mail->AddEmbeddedImage('imagenes-sistema/logo.png', 'logo_empresa');
 
     $mail->send();

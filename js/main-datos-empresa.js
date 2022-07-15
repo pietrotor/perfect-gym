@@ -30,6 +30,15 @@ function Registrar(){
 }
 
 $(document).ready(function(){
+  var triggerTabList = [].slice.call(document.querySelectorAll('#myTab a'))
+  triggerTabList.forEach(function (triggerEl) {
+    var tabTrigger = new bootstrap.Tab(triggerEl)
+  
+    triggerEl.addEventListener('click', function (event) {
+      event.preventDefault();
+      tabTrigger.show();
+    })
+  })
     $("#btnEditar").click(function(){
         //ESTÉTICA DEL MODAL
         $("#formPersonas").trigger("reset");
@@ -127,4 +136,83 @@ $(document).ready(function(){
             });            
           });
         });
+
+    $("#formConfiguraciones").submit(function(e){
+      e.preventDefault();
+      opcion = 3;
+      email_inscripcion_asunto = $.trim($("#email_inscripcion_asunto").val());    
+      email_inscripcion_cuerpo = $.trim($("#email_inscripcion_cuerpo").val());    
+      email_inscripcion_alt = $.trim($("#email_inscripcion_alt").val());    
+      email_inscripcion_texto_boton = $.trim($("#email_inscripcion_texto_boton").val());    
+      email_inscripcion_link_boton = $.trim($("#email_inscripcion_link_boton").val());    
+      email_recordatorio_asunto = $.trim($("#email_recordatorio_asunto").val());    
+      email_recordatorio_cuerpo = $.trim($("#email_recordatorio_cuerpo").val());    
+      email_recordatorio_alt = $.trim($("#email_recordatorio_alt").val());    
+      email_recordatorio_sesiones = $.trim($("#email_recordatorio_sesiones").val());    
+      email_vencimiento_asunto = $.trim($("#email_vencimiento_asunto").val());    
+      email_vencimiento_cuerpo = $.trim($("#email_vencimiento_cuerpo").val());    
+      email_vencimiento_alt = $.trim($("#email_vencimiento_alt").val());    
+      comprobante_pdf_cuerpo = $.trim($("#comprobante_pdf_cuerpo").val());    
+      $.ajax({
+        url:"bd/datos-empresa.php",
+        type: "POST",
+        dataType: "json",
+        async:false,
+        data:{ opcion, email_inscripcion_asunto, email_inscripcion_cuerpo, email_inscripcion_alt, email_inscripcion_texto_boton, email_inscripcion_link_boton,
+          email_recordatorio_asunto, email_recordatorio_cuerpo, email_recordatorio_alt, email_recordatorio_sesiones, email_vencimiento_asunto, email_vencimiento_cuerpo,
+          email_vencimiento_alt, comprobante_pdf_cuerpo },
+        success:function(data){                    
+
+        }
+      });
+      $("#modalConfiguraciones").modal("hide");
+      $.ajax({
+        url: window.location.href,
+        headers: {
+            "Pragma": "no-cache",
+            "Expires": -1,
+            "Cache-Control": "no-cache"
+        }
+      }).done(function () {
+        swal({
+          title:"Cambios Guardados",
+          text: "Se realizo guardo los cambios de manera correcta",
+          type: "success",
+          timer: 1500,
+          showConfirmButton: false
+        }, function(){
+          window.history.forward(1);
+          location.reload(true);
+          });            
+      });
+
+    })
+    $("#textRichText").click(function(){
+      const valorRichText = $(".content").val()
+      console.log('RICH: ', valorRichText);
+      alert('CLICK');
+    })
+
+    $("#configuraciones").click(function(){
+      console.log('CLICK');
+      $(".modal-header").css("background-color","#007BFF");
+      $(".modal-title").text("Configuraciones");
+      $(".modal-title").css("color","#ffffff");
+      $(".modal-title").css("font-weight","bold");
+      $("#modalConfiguraciones").modal("show");
+    })
+
+    $("#backup").click (function(){
+      console.log("EMPEZO EL BACKUP");
+      $.ajax({
+        url:"bd/crear-backup.php",
+        type: "POST",
+        async:false,
+        data:{  },
+        success:function(data){                    
+          swal("Back Up", "Se realizo el respaldo de la base de datos de forma correcta", "success");
+        }
+      });
+      console.log("TERMINO EL BACKUP");
+    })
 });

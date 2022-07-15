@@ -129,50 +129,43 @@ $(document).ready(function(){
         }
 
   });
-
-
-
-
-
-
   // Clases
-
   // MEMBRESIA - AGREGAR A LA BASE DE DATOS
-  $("#formClases").submit(function(e){
-    e.preventDefault();
-    // id=$trim($("#id").val());
-    id = $.trim($("#id-cliente").val());
-    clase = $.trim($("#id-clase").val());
-    sesiones = $.trim($("#sesiones").val());
-    fecha_ini = $("#fecha_ini").val();
-    fecha_fin = $("#fecha_fin").val();
-    precio= $("#precio").val();
-    $.ajax({
-      url:"bd/membresia.php",
-      type: "POST",
-      dataType: "json",
-      data:{clase:clase, sesiones:sesiones, fecha_ini:fecha_ini, fecha_fin:fecha_fin, id:id,precio:precio},
-      success:function(data){
-        // var datos=JSON.parse(data);
-        console.log('AGREGO MEMBRESIA');
-        console.log('DATOS');
-        console.log(id);
-        console.log(clase);
-        console.log(sesiones);
-        console.log(fecha_ini);
-        nom_clase= data[0].clase;
-        console.log(nom_clase);
-        console.log(data[0].nombre);
-        console.log(data[0].correo);        
-        tablaPersonas.row.add([data[0].id, data[0].nombre, data[0].apellido, data[0].carnet_identidad, data[0].sexo, data[0].telefono, data[0].correo,  data[0].clase,  data[0].estado]).draw();        
-      }
-    });
-    $("#modalMembresia").modal("hide");
-    $(".modal-title").text("COMPROBANTE DE INSCRIPCIÓN");
-    document.getElementById('id-cliente-paso').value=id;
-    $('#modalPDF').modal({backdrop: 'static', keyboard: false});
-    $("#modalPDF").modal("show");
-  });
+  // $("#formClases").submit(function(e) {
+  //   e.preventDefault();
+  //   // id=$trim($("#id").val());
+  //   id = $.trim($("#id-cliente").val());
+  //   clase = $.trim($("#id-clase").val());
+  //   sesiones = $.trim($("#sesiones").val());
+  //   fecha_ini = $("#fecha_ini").val();
+  //   fecha_fin = $("#fecha_fin").val();
+  //   precio= $("#precio").val();
+  //   $.ajax({
+  //     url:"bd/membresia.php",
+  //     type: "POST",
+  //     dataType: "json",
+  //     data:{clase:clase, sesiones:sesiones, fecha_ini:fecha_ini, fecha_fin:fecha_fin, id:id,precio:precio},
+  //     success:function(data){
+  //       // var datos=JSON.parse(data);
+  //       console.log('AGREGO MEMBRESIA');
+  //       console.log('DATOS');
+  //       console.log(id);
+  //       console.log(clase);
+  //       console.log(sesiones);
+  //       console.log(fecha_ini);
+  //       nom_clase= data[0].clase;
+  //       console.log(nom_clase);
+  //       console.log(data[0].nombre);
+  //       console.log(data[0].correo);        
+  //       tablaPersonas.row.add([data[0].id, data[0].nombre, data[0].apellido, data[0].carnet_identidad, data[0].sexo, data[0].telefono, data[0].correo,  data[0].clase,  data[0].estado]).draw();        
+  //     }
+  //   });
+  //   $("#modalMembresia").modal("hide");
+  //   $(".modal-title").text("COMPROBANTE DE INSCRIPCIÓN");
+  //   document.getElementById('id-cliente-paso').value=id;
+  //   $('#modalPDF').modal({backdrop: 'static', keyboard: false});
+  //   $("#modalPDF").modal("show");
+  // });
   // FIN - AGREGAR A LA BASE DE DATOS
 
   // FIN - CLASES
@@ -412,7 +405,31 @@ $(document).on("click",".btnClienteDatos", function(){
     // id=$trim($("#id").val());
     id = $.trim($("#id-cliente").val());
     id_grupo = $('#horario').val();    
-    fecha_ini = $("#fecha_ini").val();    
+    fecha_ini = $("#fecha_ini").val(); 
+    hay_cupos = true;
+    $.ajax({
+      url:"bd/verificar-cupos.php",
+      type: "POST",
+      dataType: "json",
+      async:false,
+      data:{ id_grupo },
+      success:function(data){
+        if (parseInt(data.limitar_cupos) === 1) {
+          if (parseInt(data.cupos_disponibles) <= 0) {
+            console.log('NO HAY CUPOS');
+            hay_cupos = false;
+            return
+          } else {
+            console.log('SI HAY CUPOS');
+            hay_cupos = true;
+          }
+        }
+      }
+    })
+    if (!hay_cupos) {
+      swal("No existen cupos Disponibles", "Sin Cupos", "warning");
+      return
+    }   
     $.ajax({
       url:"bd/membresia.php",
       type: "POST",

@@ -228,14 +228,18 @@
                       <label for="Nombre" class="col-form-label">Precio:</label>
                       <input type="text" class="form-control" id="precio" disabled>
                     </div>                                                        
-                    <div class="form-group col-lg-4">
+                    <div class="form-group col-lg-3">
                       <label for="Nombre" class="col-form-label">Sesiones:</label>
                       <input type="text" class="form-control" id="sesiones" disabled>
                     </div>                 
-                    <div class="form-group col-lg-6">
+                    <div class="form-group col-lg-4">
                       <label for="Nombre" class="col-form-label">Instructor:</label>
                       <input type="text" class="form-control" id="instructor" disabled>                      
-                    </div>                
+                    </div> 
+                    <div class="form-group col-lg-3">
+                      <label for="Nombre" class="col-form-label">Cupos Disponibles:</label>
+                      <input type="text" class="form-control" id="cupos_disponibles" disabled>                      
+                    </div>                               
                   </div>   
                   <div class="row"> 
                     <div class="form-group col-lg-4">
@@ -294,8 +298,6 @@
            </div>           
         </div>
       </div>
-
-
       <!-- FIN MODAL 3 -->
       
       <!-- FIN DEL CONTENIDO -->
@@ -348,8 +350,6 @@
       mes='0'+mes; //agrega cero si el menor de 10   
     fecha_actual=ano+"-"+mes+"-"+dia;       
     $(document).ready(function(){
-    
-      
         $('#id-clase').change(function(){
           id_clase_precio=$('#id-clase').val();
           console.log(id_clase_precio);    
@@ -359,7 +359,7 @@
           $('#fecha_fin').val("");
           $('#id_sala').val("");           
           $('#fecha_ini').val(fecha_actual);          
-                
+          $('#cupos_disponibles').val('');
         });
 
         $('#id-clase').change(function(){          
@@ -389,7 +389,12 @@
                       $('#sesiones').val(data.sesiones);                                          
                       $('#instructor').val(data.nombre+" "+data.apellido);                                               
                       $('#fecha_fin').val(data.tiempo_limite);                                        
-                      $('#id_sala').val(data.sala);                                        
+                      $('#id_sala').val(data.sala);
+                      if (data.limitar_cupos == 1) {
+                        $('#cupos_disponibles').val(data.cupos_disponibles);
+                      } else {
+                        $('#cupos_disponibles').val('Sin Limites');
+                      }                             
                     };                                        
                     return true;
                  }

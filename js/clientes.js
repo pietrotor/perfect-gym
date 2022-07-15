@@ -1,6 +1,7 @@
+function mostrar_swat_exitoso(titulo, mensaje, tipo = "success"){
+  swal(titulo, mensaje, tipo);
+}
 $(document).ready(function(){
-
-
   var triggerTabList = [].slice.call(document.querySelectorAll('#myTab a'))
 triggerTabList.forEach(function (triggerEl) {
   var tabTrigger = new bootstrap.Tab(triggerEl)
@@ -174,12 +175,36 @@ let estado_memb=0; //VE SI EXISTE ALGUNA MEMBRESIA ACTIVA
   });
   // FIN - AGREGAR A LA BASE DE DATOS
 
-  $("#formClases").submit(function(e){//agregar membresia
+  $("#formClases").submit(function(e){  //Agregar membresia
     e.preventDefault();    
     id = $.trim($("#id-cliente").val());
     id_grupo = $('#horario').val();    
-    fecha_ini = $("#fecha_ini").val(); 
-    opcion = 1;      
+    fecha_ini = $("#fecha_ini").val();
+    opcion = 1;
+    hay_cupos = true;
+    $.ajax({
+      url:"bd/verificar-cupos.php",
+      type: "POST",
+      dataType: "json",
+      async:false,
+      data:{ id_grupo },
+      success:function(data){
+        if (parseInt(data.limitar_cupos) === 1) {
+          if (parseInt(data.cupos_disponibles) <= 0) {
+            console.log('NO HAY CUPOS');
+            hay_cupos = false;
+            return
+          } else {
+            console.log('SI HAY CUPOS');
+            hay_cupos = true;
+          }
+        }
+      }
+    })
+    if (!hay_cupos) {
+      swal("No existen cupos Disponibles", "Sin Cupos", "warning");
+      return
+    }
     $.ajax({
       url:"bd/membresia.php",
       type: "POST",
@@ -190,6 +215,7 @@ let estado_memb=0; //VE SI EXISTE ALGUNA MEMBRESIA ACTIVA
         hora_unida= data[0].hora_inicio.slice(0,5) + " - " + data[0].hora_fin.slice(0,5);
         $('.btnRenovar').css("display","none");
         tablaPersonas.row.add([data[0].id, data[0].clase, hora_unida, data[0].fecha_membresia, data[0].fecha_end_membresia, data[0].precio, data[0].estado]).draw();        
+        id_membresia_impresion = data[0].id;
       }
     });
     $("#modalMembresia").modal("hide");    

@@ -113,11 +113,7 @@
                                 </div> 
                             </div>                          
                             <div class="row">
-                                <div class="form-group col-lg-2">
-                                    <label for="Nombre" class="col-form-label">Precio:</label>
-                                    <input type="number" class="form-control" id="precio">
-                                </div>                    
-                                <div class="form-group col-lg-3">
+                                <div class="form-group col-lg-5">
                                     <label for="Nombre" class="col-form-label">Sala:</label>
                                     <select class="form-control" name="cliente" id="id_sala">
                                     <?php
@@ -158,6 +154,31 @@
                                     <input type="number" class="form-control" id="dias_limite" required>                                                    
                                 </div>                                
                             </div>                                                       
+                            <div class="row">
+                                <div class="form-group col-lg-2">
+                                    <label for="Nombre" class="col-form-label">Precio:</label>
+                                    <input type="number" class="form-control" id="precio">
+                                </div>
+                                <div class="col-lg-3">
+                                    <label for="Nombre" class="col-form-label">Limitar Cupos:</label>
+                                    <div style="
+                                        display: flex;
+                                        height: 36px;
+                                        align-items: center;
+                                    ">
+                                        <input type="checkbox" class="form-control" id="limitar_cupos" style="
+                                        height: 20px;
+                                        left: 0;
+                                        margin-left: 0;
+                                        width: 20px;
+                                        ">                                        
+                                    </div>
+                                </div>
+                                <div class="form-group col-lg-3" id="cupos_container">
+                                    <label for="Nombre" class="col-form-label">Cupos Maximos:</label>
+                                    <input type="number" class="form-control" id="maximo_cupo">
+                                </div>
+                            </div>
                         </div>                          
                     </div>
                     <div class="modal-footer">

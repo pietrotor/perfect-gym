@@ -36,7 +36,34 @@ include_once("conexion.php");
     foreach ($data as $row) {                    
         $return3 = array ('sala' => $row['sala']);                               
     }
-  }  
-  $return_final=array_merge($return1,$return2,$return3);
+  }
+  $consulta = "SELECT limitar_cupos, maximo_cupo FROM grupo WHERE id = '$id_grupo'";
+  $resultado = $conexion->prepare($consulta);
+  $resultado->execute();
+  $data=$resultado->fetchAll(PDO::FETCH_ASSOC);  
+  if ($data){
+    foreach ($data as $row) {                    
+        $return_limitado = array ('limitar_cupos' => $row['limitar_cupos'], 'maximo_cupo' => $row['maximo_cupo']);                               
+    }
+  }
+  $return_cantidad_de_inscritos = [];
+  // Obtenemos la cantidad de Inscritos
+  if ((int)$return_limitado['limitar_cupos'] == 1) {
+    $consulta = "SELECT COUNT(id) as inscritos FROM membresia WHERE id_grupo = '$id_grupo' AND estado = 1";
+    $resultado = $conexion->prepare($consulta);
+    $resultado->execute();
+    $data=$resultado->fetchAll(PDO::FETCH_ASSOC);  
+    if ($data){
+      foreach ($data as $row) {                    
+          $return_cantidad_de_inscritos = array ('inscritos' => $row['inscritos']);
+      }
+    }
+    $dispo = (int)$return_limitado['maximo_cupo'] - (int)$return_cantidad_de_inscritos['inscritos'];
+    $return_cupos_disponibles = array('cupos_disponibles' => $dispo);
+  } else {
+    $return_cupos_disponibles = array ('cupos_disponibles' => (int)$return_limitado['maximo_cupo']);
+  }
+
+  $return_final=array_merge($return1, $return2, $return3, $return_limitado, $return_cupos_disponibles, $return_cantidad_de_inscritos);
 die(json_encode($return_final));
 $conexion = NULL;

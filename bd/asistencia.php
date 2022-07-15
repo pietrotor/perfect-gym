@@ -76,16 +76,30 @@ include_once("conexion.php");
           $resultado = $conexion->prepare($consulta);
           $resultado->execute();          
         }
+        $consulta = "SELECT  *  FROM datos_empresa"; 
+        $resultado = $conexion->prepare($consulta);
+        $resultado->execute();
+        $data=$resultado->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($data as $row) {
+          $returnDatosEmpresa = array ( 'razon_social' => $row['razon_social'],
+                                        'link_inscripcion_email' => $row['link_inscripcion_email'],
+                                        'asunto_recordatorio_email' => $row['asunto_recordatorio_email'],
+                                        'cuerpo_recordatorio_email' => $row['cuerpo_recordatorio_email'],
+                                        'alt_recordatorio_email' => $row['alt_recordatorio_email'],
+                                        'sesiones_recordatorio_email' => $row['sesiones_recordatorio_email'],
+                                        'asunto_vencimiento_email' => $row['asunto_vencimiento_email'],
+                                        'cuerpo_vencimiento_email' => $row['cuerpo_vencimiento_email'],
+                                        'alt_vencimiento_email' => $row['alt_vencimiento_email']);
+        }
 
-
-        $return_final=array_merge($return1,$return,$return2);
+        $return_final=array_merge($return1,$return,$return2, $returnDatosEmpresa);
       }else{
         $return_final = array('error'=>'NO TIENE MEMBRESIA ACTIVA ');
       } 
   } 
   
   if(isset($return_final['sesion'])){
-    if ($return_final['sesion'] == 3){
+    if ($return_final['sesion'] == $return_final['sesiones_recordatorio_email']){
       include_once('../pdf-recordatorio.php');
     }
     if ($return_final['sesion'] == 0){

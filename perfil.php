@@ -170,11 +170,6 @@
               </button>
             </div>  
             <!--INICIO DE TABS-->
-            
-           
-               
-             
-
             <form id="formPersonas">
               <div class="modal-body">
                 

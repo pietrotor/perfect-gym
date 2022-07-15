@@ -61,12 +61,19 @@ $(document).ready(function(){
         hora_inicio = $("#ini_hora").val() + ":00";
         hora_fin = $("#fin_hora").val() + ":00";
         dias_limite = $("#dias_limite").val();               
+        if($("#limitar_cupos").prop("checked")) {
+          limitar_cupos = 1
+          maximo_cupo = $("#maximo_cupo").val();
+        } else {
+          limitar_cupos = 0
+          maximo_cupo = 0;
+        }
         $.ajax({
         url:"bd/crud-horario.php",
         type: "POST",
         dataType: "json",
         async:false,
-        data:{ id:id ,id_clase:id_clase, denominacion:denominacion, instructor:instructor, sesiones:sesiones, precio:precio, sala:sala, hora_inicio:hora_inicio, hora_fin:hora_fin, dias_limite:dias_limite, opcion:opcion},
+        data:{ id:id ,id_clase:id_clase, denominacion:denominacion, instructor:instructor, sesiones:sesiones, precio:precio, sala:sala, hora_inicio:hora_inicio, hora_fin:hora_fin, dias_limite:dias_limite, limitar_cupos, maximo_cupo, opcion:opcion },
         success:function(data){           
             data[0].hora_inicio=data[0].hora_inicio.slice(0,-3);
             data[0].hora_fin=data[0].hora_fin.slice(0,-3);
@@ -117,7 +124,16 @@ $(document).ready(function(){
           text_hora_ini = text_hora_ini.slice(0,-3);
           $('#ini_hora').val(data.hora_inicio.slice(0,-3));
           $('#fin_hora').val(data.hora_fin.slice(0,-3));
-          $('#dias_limite').val(data.sesiones);
+          $('#dias_limite').val(data.sesiones)
+          if(parseInt(data.limitar_cupos) === 1) {
+            $('#limitar_cupos').prop('checked', true);
+            $("#cupos_container").show();
+            $('#maximo_cupo').val(data.maximo_cupo);
+          } else {
+            $('#limitar_cupos').prop('checked', false);
+            $('#maximo_cupo').val(10);
+            $("#cupos_container").hide();
+          }
         }
       });
       opcion=2; //editar
@@ -148,14 +164,23 @@ $(document).ready(function(){
           type: "POST",
           dataType: "json",
           data:{ opcion:opcion, id:id },
-          success:function(data){                      
-            tableDisc.row(fila.parents('tr')).remove().draw();  
+          success:function(data) {
+            tableDisc.row(fila.parents('tr')).remove().draw();
           }
         });
         swal("Eliminado", "El horario se elimino correctamente", "success");
-      });  
+      });
     });
     // FIN - ELIMINAR REGISTRO
+    $("#cupos_container").hide();
+    // Limitar Cupos
+    $("#limitar_cupos").change(function(){
+      if (this.checked) {
+        $("#cupos_container").show();
+      } else {
+        $("#cupos_container").hide();
+      }
+    })
 
   });
   

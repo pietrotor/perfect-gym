@@ -8,13 +8,22 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 //GRAB ENQURY DATA
 $enquirydata=[
+  'razon_social'=>$return_final['razon_social'],
+  'link'=>$return_final['link_inscripcion_email'],
   'nombre'=>$return_final['nombre'],
   'apellido'=>$return_final['apellido'],
   'correo'=>$return_final['correo'],
   'id_membresia'=>$return_final['id_membresia'],
   'sesiones'=>$return_final['sesion'],  
   'inicio'=>$return_final['inicio'],  
-  'fin'=>$return_final['fin']
+  'fin'=>$return_final['fin'],
+  'asunto_recordatorio'=>$return_final['asunto_recordatorio_email'],
+  'cuerpo_recordatorio'=>$return_final['cuerpo_recordatorio_email'],
+  'alt_recordatorio'=>$return_final['alt_recordatorio_email'],
+  'sesiones_recordatorio'=>$return_final['sesiones_recordatorio_email'],
+  'asunto_vencimiento'=>$return_final['asunto_vencimiento_email'],
+  'cuerpo_vencimiento'=>$return_final['cuerpo_vencimiento_email'],
+  'alt_vencimiento'=>$return_final['alt_vencimiento_email']
 ];
 
 //LLAMAMOS A LA FUNCION ENVIAR EMAIL
@@ -28,17 +37,15 @@ function sendEmail($enquirydata){
 //CREAMOS EL CUERPO DEL CORREO
 $bodycorreo='';
 $asunto='';
-if($enquirydata['sesiones'] == 3){
-    $asunto='Recordatorio de Renovacion';
+if($enquirydata['sesiones'] == $enquirydata['sesiones_recordatorio']){
+    $asunto = $enquirydata['asunto_recordatorio'];
     $bodycorreo='Te queremos recordar que solo te quedan '.$enquirydata['sesiones'].' antes que concluya tu membresia el '.$enquirydata['fin'].', por 
     ello te aconsejamos que renueves tu membresia lo antes posible para evitar pasar malos ratos.<br><br>
     Sin ningun otro asunto nos despedimos y te desamos un lindo día.<br></p><br>';
+    $bodycorreo = $enquirydata['cuerpo_recordatorio'];
 }else{
-    $asunto='Renovacion de Membresia';
-    $bodycorreo='Lamentablemente tu membresia a concluido, muuchas gracias por la confiza que deposistaste en nostros durante este tiempo.<br><br>
-                 Esperamos que renueves tu membresia lo más pronto posible, para ello puedes pasar por nuestras instalaciones para realizar tu pago y 
-                 seguir haciendo lo que más te gusta.<br><br>
-                 Sin ningun otro asunto nos despedimos y te desamos un lindo día.<br></p><br>'; 
+    $asunto = $enquirydata['asunto_vencimiento'];
+    $bodycorreo = $enquirydata['cuerpo_vencimiento']; 
 }
 
 $cuerpocorreo='<!DOCTYPE html>
@@ -47,14 +54,14 @@ $cuerpocorreo='<!DOCTYPE html>
 	<meta charset="utf-8">
 	<title>holi</title>
 </head>
-<body style="background-color: black ">
+<body style="background-color: transparent ">
 
 <!--Copia desde aquí-->
 <table style="max-width: 600px; padding: 10px; margin:0 auto; border-collapse: collapse;">
 	<tr>
 		<td style="background-color: #ecf0f1; text-align: left; padding: 0">
-			<a href="https://www.facebook.com/PokemonTrujillo/">
-				<img width="20%" style="display:block; margin: 1.5% 3%" src="https://assets.website-files.com/5e39634c9e322569a23b267b/5e6265e15e2b260e4ce57bc8_fitco.png">
+			<a href='.$enquirydata['link'].' style="display: flex;justify-content: center;">
+                <img width="20%" style="display:block; margin: 0 auto;" src="cid:logo_empresa">
 			</a>
 		</td>
 	</tr>
@@ -65,10 +72,7 @@ $cuerpocorreo='<!DOCTYPE html>
 				<h2 style="color: #e67e22; margin: 0 0 7px">Hola '.$enquirydata['nombre'].'</h2>
 				<p style="margin: 2px; font-size: 15px">
 					'.$bodycorreo.'				
-				<div style="width: 100%; text-align: center">
-					<a style="text-decoration: none; border-radius: 5px; padding: 11px 23px; color: white; background-color: #3498db" href="https://www.facebook.com/fitco.community/">Visita nuestra pagina de Facebook</a>	
-				</div>
-				<p style="color: #b3b3b3; font-size: 12px; text-align: center;margin: 30px 0 0">FITCO 2021</p>
+				<p style="color: #b3b3b3; font-size: 12px; text-align: center;margin: 30px 0 0">'.$enquirydata['razon_social'].' '.date("Y").'</p>
 			</div>
 		</td>
 	</tr>
@@ -94,7 +98,7 @@ try {
     $mail->Port       = 587;                                    // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
 
     //Recipients
-    $mail->setFrom('torricopietro@gmail.com', 'Fitco');
+    $mail->setFrom('torricopietro@gmail.com', $enquirydata['razon_social']);
     $mail->addAddress($enquirydata['correo'], $enquirydata['nombre'].' '.$enquirydata['apellido']);     // Add a recipient    
     
 
@@ -102,7 +106,8 @@ try {
     $mail->isHTML(true);                                  // Set email format to HTML
     $mail->Subject = $asunto;
     $mail->Body    = $cuerpocorreo;
-    $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+    $mail->AltBody = $enquirydata['sesiones'] == $enquirydata['sesiones_recordatorio'] ? $enquirydata['alt_recordatorio'] : $enquirydata['alt_vencimiento'];
+    $mail->AddEmbeddedImage('../imagenes-sistema/logo.png', 'logo_empresa');
     $mail->send();
     //header('Location:crear-pdf-get.php?id_membresia='.$enquirydata['id_membresia']);
 } catch (Exception $e) {

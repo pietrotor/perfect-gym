@@ -336,13 +336,17 @@
                       <label for="Nombre" class="col-form-label">Precio:</label>
                       <input type="text" class="form-control" id="precio" disabled>
                     </div>                                                        
-                    <div class="form-group col-lg-4">
+                    <div class="form-group col-lg-3">
                       <label for="Nombre" class="col-form-label">Sesiones:</label>
                       <input type="text" class="form-control" id="sesiones" disabled>
                     </div>                 
-                    <div class="form-group col-lg-6">
+                    <div class="form-group col-lg-4">
                       <label for="Nombre" class="col-form-label">Instructor:</label>
                       <input type="text" class="form-control" id="instructor" disabled>                      
+                    </div>                
+                    <div class="form-group col-lg-3">
+                      <label for="Nombre" class="col-form-label">Cupos Disponibles:</label>
+                      <input type="text" class="form-control" id="cupos_disponibles" disabled>                      
                     </div>                
                   </div>   
                   <div class="row"> 
@@ -384,6 +388,8 @@
   <script src="bootstrap/js/bootstrap.min.js"></script>
   <!-- datatables JS -->
   <script type="text/javascript" src="datatables/datatables.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert-dev.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css">
   <script src="dist/js/scripts.js"></script>
   <script type="text/javascript" src="js/clientes.js"></script>
   <script type="text/javascript">
@@ -466,7 +472,14 @@
                       $('#sesiones').val(data.sesiones);                                          
                       $('#instructor').val(data.nombre+" "+data.apellido);                                               
                       $('#fecha_fin').val(data.tiempo_limite);                                        
-                      $('#id_sala').val(data.sala);                                        
+                      $('#id_sala').val(data.sala);
+                      console.log('LIMITADO: ', data.limitar_cupos);
+                      console.log('cupos_disponibles: ', data.cupos_disponibles);
+                      if (data.limitar_cupos == 1) {
+                        $('#cupos_disponibles').val(data.cupos_disponibles);
+                      } else {
+                        $('#cupos_disponibles').val('Sin Limites');
+                      }
                     };                                        
                     return true;
                  }

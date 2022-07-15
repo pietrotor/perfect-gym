@@ -16,13 +16,15 @@ $conexion=$objeto->Conectar();
     $hora_inicio=(isset($_POST['hora_inicio'])) ? $_POST['hora_inicio'] : '';
     $hora_fin=(isset($_POST['hora_fin'])) ? $_POST['hora_fin'] : '';
     $dias_limite=(isset($_POST['dias_limite'])) ? $_POST['dias_limite'] : '';
+    $limitar_cupos=(isset($_POST['limitar_cupos'])) ? $_POST['limitar_cupos'] : ''; 
+    $maximo_cupo=(isset($_POST['maximo_cupo'])) ? $_POST['maximo_cupo'] : ''; 
     $opcion=(isset($_POST['opcion'])) ? $_POST['opcion'] : ''; 
 
 
     switch ($opcion) {
       case 1://REGISTRO
-        $consulta = "INSERT INTO grupo (denominacion, hora_inicio, hora_fin, precio, sesiones, tiempo_limite, id_clase, id_instructor, id_sala) 
-        VALUES('$denominacion', '$hora_inicio', '$hora_fin','$precio', '$sesiones', '$dias_limite','$id_clase', '$instructor', '$sala') ";
+        $consulta = "INSERT INTO grupo (denominacion, hora_inicio, hora_fin, precio, sesiones, tiempo_limite, limitar_cupos, maximo_cupo, id_clase, id_instructor, id_sala) 
+        VALUES('$denominacion', '$hora_inicio', '$hora_fin','$precio', '$sesiones', '$dias_limite', '$limitar_cupos', '$maximo_cupo', '$id_clase', '$instructor', '$sala') ";
         $resultado = $conexion->prepare($consulta);
         $resultado->execute();
 
@@ -35,7 +37,7 @@ $conexion=$objeto->Conectar();
         break;
       case 2://MODIFCACION
         $consulta = "UPDATE grupo SET denominacion='$denominacion', hora_inicio='$hora_inicio', hora_fin='$hora_fin', precio='$precio'
-             , sesiones='$sesiones', tiempo_limite='$dias_limite',  id_clase='$id_clase',
+             , sesiones='$sesiones', tiempo_limite='$dias_limite', limitar_cupos='$limitar_cupos', maximo_cupo='$maximo_cupo', id_clase='$id_clase',
              id_instructor='$instructor', id_sala = '$sala'
              WHERE id='$id'";
         $resultado = $conexion->prepare($consulta);
