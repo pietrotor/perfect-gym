@@ -32,25 +32,28 @@ $(document).ready(function(){
                 if(data.error!==undefined){
                     $('#estado').html(''+data.error);
                     showalert(data.error,'alert-danger')
-                    $('#nombre').val('');
-                    $('#apellido').val('');
+                    if(data.nombre!==undefined){$('#nombre').val(data.nombre)};
+                    if(data.apellido!==undefined){$('#apellido').val(data.apellido)};
                     $('#fecha_in').val('');
                     $('#fecha_fin').val('');
                     $('#sesiones').val('');
                     $('#discipli').val('');
                     $('#codigo_acceso').val('');
-                    cambiarsrc('foto-persona',imagne_default)
+                    if(data.foto!=='') cambiarsrc('foto-persona',data.foto)
+                    else cambiarsrc('foto-persona',imagne_default)                    
+
                     return false;
                  } else {
                     $('#codigo_acceso').val('');                    
                     if(data.sesion!==undefined){$('#sesiones').val(data.sesion);if(data.sesion<=3){mesaje_alerta_sesiones='Solo quedan '+data.sesion+' sesiones, recuerda renovar tu membresia'}else{mesaje_alerta_sesiones='';}};
-                    if(data.nombre!==undefined){$('#nombre').val(data.nombre)};                    
+                    if(data.nombre!==undefined){$('#nombre').val(data.nombre)};
                     if(data.apellido!==undefined){$('#apellido').val(data.apellido)};
                     if(data.inicio!==undefined){$('#fecha_in').val(data.inicio)};
                     if(data.fin!==undefined){$('#fecha_fin').val(data.fin)};
-                    if(data.clase!==undefined){$('#discipli').val(data.clase)};                             
-                    if(data.foto!==''){cambiarsrc('foto-persona',data.foto)};                             
+                    if(data.clase!==undefined){$('#discipli').val(data.clase)};
+                    if(data.foto!==''){cambiarsrc('foto-persona',data.foto)};
                     showalert('Bienvenido, ingrese por favor. '+mesaje_alerta_sesiones,'alert-success');
+
                     return true;
                  }
             }
