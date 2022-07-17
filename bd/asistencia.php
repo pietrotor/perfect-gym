@@ -99,7 +99,7 @@ include_once("conexion.php");
         $return_final=array_merge($client_info,$return,$return2, $returnDatosEmpresa);
       }else{
         $error = array('error' => 'NO TIENE MEMBRESIA ACTIVA');
-        $return_final = array_merge($client_info, $erro);
+        $return_final = array_merge($client_info, $error);
       } 
   } 
   
