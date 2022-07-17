@@ -15,8 +15,7 @@ include_once("conexion.php");
   if ($data){
     foreach ($data as $row) {            
         $id=$row['id'];
-        $return1 = array ('id' => $row['id'],'nombre' => $row['nombre'],'apellido' => $row['apellido'],'correo' => $row['correo'],'foto' => $row['foto']);                          
-        
+        $client_info = array ('id' => $row['id'],'nombre' => $row['nombre'],'apellido' => $row['apellido'],'correo' => $row['correo'],'foto' => $row['foto']);
     }
   }else{
     $return_final = array('error'=>'El carnet de identidad no esta guardado en la base de datos');
@@ -27,7 +26,12 @@ include_once("conexion.php");
   $hoy= date('Y-m-d');
   $hora = date("H:i:s");
   if ($id!=''){
-      $consulta = "SELECT  num_clases,fecha_membresia,fecha_end_membresia,id_grupo,id  FROM membresia WHERE id_cliente = '$id' AND estado = '1'  AND fecha_end_membresia >='$hoy' AND num_clases > '0' ";      
+      $consulta = "SELECT  num_clases,fecha_membresia,fecha_end_membresia,id_grupo,id 
+                  FROM membresia 
+                  WHERE id_cliente = '$id'
+                  AND estado = '1'
+                  AND fecha_end_membresia >='$hoy'
+                  AND num_clases > '0' ";      
       $resultado = $conexion->prepare($consulta);
       $resultado->execute();
       $data1=$resultado->fetchAll(PDO::FETCH_ASSOC);
@@ -92,9 +96,10 @@ include_once("conexion.php");
                                         'alt_vencimiento_email' => $row['alt_vencimiento_email']);
         }
 
-        $return_final=array_merge($return1,$return,$return2, $returnDatosEmpresa);
+        $return_final=array_merge($client_info,$return,$return2, $returnDatosEmpresa);
       }else{
-        $return_final = array('error'=>'NO TIENE MEMBRESIA ACTIVA ');
+        $error = array('error' => 'NO TIENE MEMBRESIA ACTIVA');
+        $return_final = array_merge($client_info, $erro);
       } 
   } 
   
