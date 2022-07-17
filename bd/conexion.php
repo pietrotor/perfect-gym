@@ -4,9 +4,9 @@
     public static function Conectar(){
       define('servidor','us-cdbr-east-06.cleardb.net');
       // define('nombre_bd','perfect-gym2');
-      define('nombre_bd','heroku_d3b6dc432a58281');
-      define('usuario','baf3a3884f845c');
-      define('password','34c0c617');
+      define('nombre_bd','heroku_b9a10f3a12f1d56');
+      define('usuario','b5504b2a5ea27e');
+      define('password','2683f689');
       $opciones=array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8");
       try {
           $conexion=new PDO("mysql:host=".servidor."; dbname=".nombre_bd, usuario, password, $opciones);
