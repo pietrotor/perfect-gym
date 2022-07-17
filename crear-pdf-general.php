@@ -90,7 +90,7 @@ $conteHTML='<!DOCTYPE html>
   <head>
     <meta charset="utf-8">
     <title>COMPROBANTE DE INSCRIPCION</title>
-    <link rel="stylesheet" href="platilla/style.css" media="all" />
+    <link rel="stylesheet" href="./Platilla/style.css" media="all" />
     
   </head>
   <body>
