@@ -14,10 +14,10 @@
   // $consulta="SELECT membresia.id, clase.clase, membresia.fecha_membresia, membresia.fecha_end_membresia, clase.precio, membresia.estado
   //            FROM cliente INNER JOIN (instructor INNER JOIN (clase INNER JOIN membresia ON clase.id = membresia.id_clase) ON instructor.id = clase.id_instructor) ON cliente.id = membresia.id_cliente
   //            where cliente.carnet_identidad='$carnet_identidad' ORDER BY membresia.id  DESC ";
-  $consulta="SELECT membresia.*, membresia_pago.monto as precio, clase.clase, grupo.hora_inicio, grupo.hora_fin
+  $consulta="SELECT membresia.*, membresia_pago.total_a_pagar as precio, clase.clase, grupo.hora_inicio, grupo.hora_fin
              FROM ((clase INNER JOIN grupo ON clase.id = grupo.id_clase) INNER JOIN membresia 
              ON grupo.id = membresia.id_grupo) INNER JOIN membresia_pago ON membresia.id = membresia_pago.id_membresia
-             where membresia.id_cliente='$id_del_cliente' ORDER BY membresia.id  DESC ";
+             where membresia.id_cliente='$id_del_cliente' GROUP BY membresia.id ORDER BY membresia.id  DESC ";
 
   $resultado=$conexion->prepare($consulta);
   $resultado->execute();
@@ -31,6 +31,27 @@
     $return_foto = array ('foto' => $row['foto']);                             
   }
   if($return_foto['foto']==""){$return_foto['foto']="imagenes/default-avatar.png";}
+
+  $consulta = "SELECT * from membresia WHERE id_cliente = '$id_del_cliente' ORDER BY id DESC LIMIT 1";
+  $resultado = $conexion->prepare($consulta);
+  $resultado->execute();
+  $data_last_membership =  $resultado->fetchAll(PDO::FETCH_ASSOC);
+  foreach ($data_last_membership as $row) {                
+    $id_last_membership = array ('id_last_membership' => $row['id']);                             
+  }
+
+  $consulta = "SELECT * from membresia_pago WHERE id_membresia = ".$id_last_membership['id_last_membership']." ORDER BY membresia_pago.id DESC LIMIT 1";
+  $resultado = $conexion->prepare($consulta);
+  $resultado->execute();
+  $data_saldo =  $resultado->fetchAll(PDO::FETCH_ASSOC);
+  $saldo = 0;
+  $show_alert = false;
+  foreach ($data_saldo as $row) {                
+    $saldo = array ('saldo' => $row['saldo'], 'total_pagado' => $row['total_pagado'], 'total_a_pagar' => $row['total_a_pagar']);                             
+  }
+  if ($saldo['saldo'] != 0) {
+    $show_alert = true;
+  }
  ?>
 
 <div class="container">
@@ -65,7 +86,25 @@
             <div class="form-group col-lg-4 ml-auto d-flex justify-content-center align-items-center">
               <img src="<?php echo $return_foto['foto'];?>" style="max-width:300px;max-height:200px; border:2px solid black;" id="foto-persona" >
             </div> 
-        </div> 
+        </div>
+        <?php
+          if ($show_alert) {
+            echo ("
+            <div class='row'>
+              <div class='col-12' style='background-color: rgba(255, 12, 12, 0.66); padding: 10px; border-radius: 5px; color: #000; margin-bottom: 20px;'>
+                <div style='display: flex; justify-content: space-between; align-items: center;'>
+                  <span>
+                    Tiene un saldo pendiente de <span style='font-weight: 900;'> ".$saldo['saldo']."</span> Bs
+                  </span>
+                  <button class='btn btn-dark' style='color: #fff;' id='btnPayBalance'>
+                    Pagar Saldo
+                  </button>
+                </div>
+              </div>
+            </div>"
+          );
+          }
+        ?>
         <!--INICIO DE TABS-->
         <ul class="nav nav-tabs" id="myTab" role="tablist">
           <li class="nav-item" role="presentation">
@@ -91,10 +130,10 @@
                       <th>Id</th>
                       <th>Disciplina</th>
                       <th>Horario</th>                      
-                      <th>Fecha Inicio</th>
-                      <th>Fecha de Finalización</th>
+                      <th>Inicio</th>
+                      <th>Vencimiento</th>
                       <th>Pago</th>
-                      <th>Membresia</th>  
+                      <th>Estado</th>  
                       <th>Acciones</th>                        
                     </tr>
                   </thead>
@@ -106,8 +145,8 @@
                       <td><?php echo $dat['id']; ?></td>
                       <td><?php echo $dat['clase']; ?></td>
                       <td><?php $hora_ini=substr($dat['hora_inicio'],0,5); $hora_fin=substr($dat['hora_fin'],0,5); echo $hora_ini." - ".$hora_fin; ?></td>
-                      <td><?php echo $dat['fecha_membresia']; ?></td>
-                      <td><?php echo $dat['fecha_end_membresia']; ?></td>
+                      <td><?php $dat['fecha_membresia']=date("d/m/Y", strtotime($dat['fecha_membresia'])); echo $dat['fecha_membresia']; ?></td>
+                      <td><?php $dat['fecha_end_membresia']=date("d/m/Y", strtotime($dat['fecha_end_membresia'])); echo $dat['fecha_end_membresia']; ?></td>
                       <td><?php echo $dat['precio']; ?></td>
                       <td><?php echo $dat['estado']; ?></td>    
                       <td></td>                  
@@ -168,7 +207,7 @@
                       <th>Clase</th>
                       <th>Fecha</th>
                       <th>Hora de ingreso</th>
-                      <th>Sesiones Restantaes</th>                                                             
+                      <th>Sesiones Restantaes</th>                      
                     </tr>
                   </thead>
                   <tbody>
@@ -228,7 +267,8 @@
                       <th>Id</th>                      
                       <th>Disciplina</th>
                       <th>Fecha de Pago</th>
-                      <th>Monto</th>                      
+                      <th>Monto</th>
+                      <th>Saldo</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -239,7 +279,8 @@
                       <td><?php echo $dat['id']; ?></td>                     
                       <td><?php echo $dat['clase']; ?></td>
                       <td><?php $dat['fecha_pago']=date("d/m/Y", strtotime($dat['fecha_pago'])); echo $dat['fecha_pago']; ?></td>
-                      <td><?php echo $dat['monto']; ?></td>                                       
+                      <td><?php echo $dat['monto']; ?></td>
+                      <td><?php echo $dat['saldo']; ?></td>
                     </tr>
                     <?php
                         }
@@ -335,7 +376,7 @@
                     <div class="form-group col-lg-2">
                       <label for="Nombre" class="col-form-label">Precio:</label>
                       <input type="text" class="form-control" id="precio" disabled>
-                    </div>                                                        
+                    </div>                 
                     <div class="form-group col-lg-3">
                       <label for="Nombre" class="col-form-label">Sesiones:</label>
                       <input type="text" class="form-control" id="sesiones" disabled>
@@ -378,7 +419,54 @@
           </div>
         </div>
       </div>
-      <!-- Fin - Modal 2 - Membreisa -->                  
+      <!-- Fin - Modal 3 - Pay Balance -->
+      <div class="modal fade" id="modalBalance" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal" role="document">
+          <div class="modal-content">
+            <div class="modal-header bg-dark">
+              <h5 class="modal-title" style="color: #FFF;" id="exampleModalLongTitle">Pagar Saldo</h5>
+              <button type="button" class="close" style="color: #FFF;" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form id="formPayBalance">
+              <div class="modal-body">                
+                <input type="text" class="d-none" id="id_membership" value="<?php echo($id_last_membership['id_last_membership']); ?>"><!-- GUARDAR EL ID del cliente -->
+                <div class="row">
+                  <div class="form-group col-lg-6">
+                    <label for="total_acumulado" class="col-form-label">Total Acumulado:</label>
+                    <input type="text" class="form-control" id="totalPagado" value="<?php echo($saldo['total_pagado']); ?> Bs" disabled/>
+                  </div>
+                  <div class="form-group col-lg-6">
+                    <label for="total_a_pagar" class="col-form-label">Total a Pagar:</label>
+                    <input type="text" class="form-control" id="totalAPagar" value="<?php echo($saldo['total_a_pagar']); ?> Bs" disabled/>
+                  </div>
+                  <div class="form-group col-lg-12">
+                    <label for="saldo" class="col-form-label">Saldo:</label>
+                    <input type="text" class="form-control" id="saldo" value="<?php echo($saldo['saldo']); ?> Bs" disabled/>
+                  </div>
+                  <div class="form-group col-lg-12">
+                    <label for="monto_pagado" class="col-form-label">Nuevo Pago:</label>
+                    <input type="number" class="form-control" id="monto_pagado" required/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-group col-lg-12">
+                    <label for="nuevo_saldo" class="col-form-label">Nuevo Saldo:</label>
+                    <input type="text" class="form-control" id="new_balance" disabled/>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="submit" id="btnMembresia" class="btn btn-primary">Registrar</button>
+              </div>                
+
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- Fin - Modal 2 - Membreisa -->
 
         
 </div>
@@ -403,36 +491,6 @@
       mes='0'+mes; //agrega cero si el menor de 10   
     fecha_actual=ano+"-"+mes+"-"+dia; 
     $(document).ready(function(){      
-      // $('#id-clase').change(function(){//llenar las disciplinas
-      //   id_clase_precio=$('#id-clase').val();
-      //   console.log(id_clase_precio);    
-      //   $.ajax({
-      //     url:"bd/precios-membre.php",
-      //     type: "POST",
-      //     dataType: "json",
-      //     data:{id_clase_precio:id_clase_precio},
-      //     success:function(data){
-      //         if(data.error!==undefined){                    
-      //             return false;
-      //          } else {
-      //             if(data.precio!==undefined){$('#precio').val(data.precio);};                                        
-      //             if(data.sesiones!==undefined){$('#sesiones').val(data.sesiones);};                                        
-      //             return true;
-      //          }
-      //     }
-      //   })
-      // });
-      // $('#id-clase').change(function(){//llenar los horarios
-        
-      //   $("#id-clase").each(function(){
-      //    id_estado_clase=id_clase_precio;
-      //    $.post("bd/cambio_horarios.php",{id_estado_clase:id_estado_clase},
-      //    function(data){
-      //        $("#horario").html(data);
-      //    });
-      //  });
-      // });
-
       $('#id-clase').change(function(){
           id_clase_precio=$('#id-clase').val();
           console.log(id_clase_precio);    
@@ -469,9 +527,9 @@
                  } else {
                     if(data.precio!==undefined){                      
                       $('#precio').val(data.precio);
-                      $('#sesiones').val(data.sesiones);                                          
-                      $('#instructor').val(data.nombre+" "+data.apellido);                                               
-                      $('#fecha_fin').val(data.tiempo_limite);                                        
+                      $('#sesiones').val(data.sesiones);   
+                      $('#instructor').val(data.nombre+" "+data.apellido);        
+                      $('#fecha_fin').val(data.tiempo_limite); 
                       $('#id_sala').val(data.sala);
                       console.log('LIMITADO: ', data.limitar_cupos);
                       console.log('cupos_disponibles: ', data.cupos_disponibles);
@@ -480,7 +538,7 @@
                       } else {
                         $('#cupos_disponibles').val('Sin Limites');
                       }
-                    };                                        
+                    }; 
                     return true;
                  }
             }
@@ -496,7 +554,7 @@
             async:false,
             data:{fecha_inicio_membresia:fecha_inicio_membresia, id_grupo:id_grupo},
             success:function(data){                                  
-              $('#fecha_fin').val(data.fecha_de_caducidad);                                        
+              $('#fecha_fin').val(data.fecha_de_caducidad); 
             }
           });
         });
