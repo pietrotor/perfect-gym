@@ -1,6 +1,7 @@
 function mostrar_swat_exitoso(titulo, mensaje, tipo = "success"){
   swal(titulo, mensaje, tipo);
 }
+
 $(document).ready(function(){
   var triggerTabList = [].slice.call(document.querySelectorAll('#myTab a'))
 triggerTabList.forEach(function (triggerEl) {
@@ -226,4 +227,45 @@ let estado_memb=0; //VE SI EXISTE ALGUNA MEMBRESIA ACTIVA
     // $("#modalPDF").modal("show");
   });
   // FIN - AGREGAR A LA BASE DE DATOS
+
+  // PAGAR SALDO
+  $("#btnPayBalance").click(function (e) { 
+    e.preventDefault();
+    $("#modalBalance").modal("show");
+  });
+  $("#monto_pagado").bind('keyup mouseup', function () {
+    console.log('HOLA');
+    const saldo = parseFloat($("#saldo").val().replace('Bs', '').trim()) - parseFloat($("#monto_pagado").val())
+    $("#new_balance").val(saldo > 0 ? `${saldo} Bs` : '0 Bs') 
+  })
+
+  $("#formPayBalance").submit(function (e) {
+    e.preventDefault();
+    const id_membresia = $("#id_membership").val()
+    const monto = parseFloat($("#monto_pagado").val())
+    if (monto <= 0) return 
+    $.ajax({
+      url:"bd/membresia-saldo.php",
+      type: "POST",
+      dataType: "json",
+      async:false,  
+      data:{
+        id_membresia,
+        monto
+      },
+      success:function(data){   
+        $("#modalBalance").modal("hide");
+        swal({
+          title: "Pago Registardo",
+          text: "Se realizo el registro del pago de manera correcta",
+          type: "success",
+          timer: 2500,
+          showConfirmButton: false
+        }, function(){
+            window.open("clientes.php", "_self");
+        });
+      }
+    });
+  });
+
 });
