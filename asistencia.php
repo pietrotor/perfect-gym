@@ -13,10 +13,23 @@
             </div>
             <div class="row">
               <div class="col-lg-12 mt-5">
-              <div class="alert alert-success alert-dismissible fade show" role="alert" id="estado">                
-              
+              <div class="alert alert-success alert-dismissible fade show" role="alert" id="estado">                              
               </div>
               <div id = "alert_placeholder"></div>
+              <div class='row d-none' id="balanceContainer">
+                <div class='col-12'>
+                  <div  style='background-color: rgba(255, 12, 12, 0.66); padding: 10px; border-radius: 5px; color: #000; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;'>
+                    <span id="balance_text">
+                      -
+                    </span>
+                    <a href="clientes.php">
+                      <button class='btn btn-dark' style='color: #fff;' id='btnPayBalance'>
+                        Pagar Saldo
+                      </button>
+                    </a>
+                  </div>
+                </div>
+              </div>
               <form id="formAsistencia" class="mb-5">
                 <div class="row">
               <div class="form-group col-lg-7">
