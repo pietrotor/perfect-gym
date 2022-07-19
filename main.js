@@ -74,9 +74,9 @@ $(document).ready(function(){
   tablaPersonas=$("#tablaPersonas").DataTable({
     "createdRow": function( row, data, dataIndex ) {
       if ( data[8] == "1" ) {        
-          $(row).find('td:eq(7)').html("<span class='badge badge-success'>Activo</span>");                             
+          $(row).find('td:eq(6)').html("<span class='badge badge-success'>Activo</span>");                             
       }else{         
-              $(row).find('td:eq(7)').html("<span class='badge badge-danger'>Vencida</span>");           
+              $(row).find('td:eq(6)').html("<span class='badge badge-danger'>Vencida</span>");           
       }    
   },
     "aaSorting": [[ 0, "desc" ]],
@@ -106,7 +106,7 @@ $(document).ready(function(){
 
     } ,
      {
-      "targets":[4],
+      "targets":[0, 4],
        "visible":false,
      }
     ],
@@ -129,46 +129,12 @@ $(document).ready(function(){
         }
 
   });
-  // Clases
-  // MEMBRESIA - AGREGAR A LA BASE DE DATOS
-  // $("#formClases").submit(function(e) {
-  //   e.preventDefault();
-  //   // id=$trim($("#id").val());
-  //   id = $.trim($("#id-cliente").val());
-  //   clase = $.trim($("#id-clase").val());
-  //   sesiones = $.trim($("#sesiones").val());
-  //   fecha_ini = $("#fecha_ini").val();
-  //   fecha_fin = $("#fecha_fin").val();
-  //   precio= $("#precio").val();
-  //   $.ajax({
-  //     url:"bd/membresia.php",
-  //     type: "POST",
-  //     dataType: "json",
-  //     data:{clase:clase, sesiones:sesiones, fecha_ini:fecha_ini, fecha_fin:fecha_fin, id:id,precio:precio},
-  //     success:function(data){
-  //       // var datos=JSON.parse(data);
-  //       console.log('AGREGO MEMBRESIA');
-  //       console.log('DATOS');
-  //       console.log(id);
-  //       console.log(clase);
-  //       console.log(sesiones);
-  //       console.log(fecha_ini);
-  //       nom_clase= data[0].clase;
-  //       console.log(nom_clase);
-  //       console.log(data[0].nombre);
-  //       console.log(data[0].correo);        
-  //       tablaPersonas.row.add([data[0].id, data[0].nombre, data[0].apellido, data[0].carnet_identidad, data[0].sexo, data[0].telefono, data[0].correo,  data[0].clase,  data[0].estado]).draw();        
-  //     }
-  //   });
-  //   $("#modalMembresia").modal("hide");
-  //   $(".modal-title").text("COMPROBANTE DE INSCRIPCIÓN");
-  //   document.getElementById('id-cliente-paso').value=id;
-  //   $('#modalPDF').modal({backdrop: 'static', keyboard: false});
-  //   $("#modalPDF").modal("show");
-  // });
-  // FIN - AGREGAR A LA BASE DE DATOS
-
-  // FIN - CLASES
+  
+  // CAMBIAR EL INPUT DE MONTO PAGADO
+  $("#monto_pagado").bind('keyup', function () {
+    const saldo = parseFloat($("#precio").val().replace('Bs', '').trim()) - parseFloat($("#monto_pagado").val())
+    $("#saldo").val(saldo > 0 ? `${saldo} Bs` : '0 Bs') 
+  })
 
   //MOSTRAR EL MODAL
   $("#btnNuevo").click(function(){
@@ -204,7 +170,7 @@ $(document).ready(function(){
     console.log("HOLI");
     fila=$(this).closest("tr");
     var data_fila=$("#tablaPersonas").DataTable().row(fila).data();
-    id = parseInt(fila.find('td:eq(0)').text());
+    id = data_fila[0]
     //INICIO RECUPERACIÓN DE DATOS
 
     $.ajax({
@@ -268,8 +234,9 @@ $(document).ready(function(){
 
   // ELIMINAR REGISTRO
   $(document).on("click",".btnBorrar", function(){
-    fila=$(this);
-    id = parseInt($(this).closest("tr").find('td:eq(0)').text());
+    const fila=$(this).closest("tr");
+    const data_fila=$("#tablaPersonas").DataTable().row(fila).data();
+    id = data_fila[0]
     opcion=3;
     swal({
       title: "¿Esta seguro?",
@@ -382,16 +349,23 @@ $(document).ready(function(){
 $(document).on("click",".btnClienteDatos", function(){
   fila=$(this).closest("tr");
   var data_fila=$("#tablaPersonas").DataTable().row(fila).data();
-  carnet_identidad=fila.find('td:eq(3)').text();
-  nombre=fila.find('td:eq(1)').text();
-  apellido=fila.find('td:eq(2)').text();
-  sexo=fila.find('td:eq(4)').text();
+  const id = data_fila[0]
+  carnet_identidad=fila.find('td:eq(2)').text();
+  nombre=fila.find('td:eq(0)').text();
+  apellido=fila.find('td:eq(1)').text();
+  sexo=fila.find('td:eq(3)').text();
   id_tabla_cliente=fila.find('td:eq(0)').text();  
   $.ajax({
     url:"bd/clientes-datos.php",
     type: "POST",  
     async:false,        
-    data:{carnet_identidad:carnet_identidad,nombre:nombre,apellido:apellido,sexo:sexo,id_tabla_cliente:id_tabla_cliente},
+    data:{
+      carnet_identidad: carnet_identidad,
+      nombre:nombre,
+      apellido:apellido,
+      sexo:sexo,
+      id_tabla_cliente: id
+    },
     success:function(data){
       console.log("Paso la Variable");                      
     }
@@ -402,10 +376,10 @@ $(document).on("click",".btnClienteDatos", function(){
   // MEMBRESIA - AGREGAR A LA BASE DE DATOS
   $("#formClases").submit(function(e){
     e.preventDefault();
-    // id=$trim($("#id").val());
     id = $.trim($("#id-cliente").val());
     id_grupo = $('#horario').val();    
-    fecha_ini = $("#fecha_ini").val(); 
+    fecha_ini = $("#fecha_ini").val();
+    monto_pagado = parseFloat($("#monto_pagado").val().trim());
     hay_cupos = true;
     $.ajax({
       url:"bd/verificar-cupos.php",
@@ -429,13 +403,13 @@ $(document).on("click",".btnClienteDatos", function(){
     if (!hay_cupos) {
       swal("No existen cupos Disponibles", "Sin Cupos", "warning");
       return
-    }   
+    }
     $.ajax({
       url:"bd/membresia.php",
       type: "POST",
       dataType: "json",
       async:false,  
-      data:{id:id, id_grupo:id_grupo, fecha_ini:fecha_ini},
+      data:{ id:id, id_grupo:id_grupo, fecha_ini:fecha_ini, monto: monto_pagado },
       success:function(data){               
         tablaPersonas.row.add([data[0].id, data[0].nombre, data[0].apellido, data[0].carnet_identidad, data[0].sexo, data[0].telefono, data[0].correo,  data[0].clase,  data[0].estado]).draw();        
       }
