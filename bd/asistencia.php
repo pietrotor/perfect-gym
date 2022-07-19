@@ -13,7 +13,7 @@ include_once("conexion.php");
   $id='';
 
   if ($data){
-    foreach ($data as $row) {            
+    foreach ($data as $row) {
         $id=$row['id'];
         $client_info = array ('id' => $row['id'],'nombre' => $row['nombre'],'apellido' => $row['apellido'],'correo' => $row['correo'],'foto' => $row['foto']);
     }
@@ -96,7 +96,15 @@ include_once("conexion.php");
                                         'alt_vencimiento_email' => $row['alt_vencimiento_email']);
         }
 
-        $return_final=array_merge($client_info,$return,$return2, $returnDatosEmpresa);
+        $consulta = "SELECT * FROM membresia_pago WHERE id_membresia = '$id_membresia' ORDER BY id DESC LIMIT 1"; 
+        $resultado = $conexion->prepare($consulta);
+        $resultado->execute();
+        $data=$resultado->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($data as $row) {
+          $return_balance_data = array ('saldo' => $row['saldo']);
+        }
+
+        $return_final=array_merge($client_info,$return,$return2, $returnDatosEmpresa, $return_balance_data);
       }else{
         $error = array('error' => 'NO TIENE MEMBRESIA ACTIVA');
         $return_final = array_merge($client_info, $error);
