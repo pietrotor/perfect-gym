@@ -13,17 +13,27 @@ $sexo=(isset($_POST['sexo'])) ? $_POST['sexo'] : '';
 $id_tabla_cliente=(isset($_POST['id_tabla_cliente'])) ? $_POST['id_tabla_cliente'] : '';
 
 
-$consulta = "SELECT id, sexo FROM cliente WHERE carnet_identidad = '$carnet_identidad'";
+$consulta = "SELECT * FROM cliente WHERE carnet_identidad = '$carnet_identidad'";
 $resultado = $conexion->prepare($consulta);
 $resultado->execute();
 $data=$resultado->fetchAll(PDO::FETCH_ASSOC);
 if ($data){
   foreach ($data as $row) {                    
-      $return1 = array ('id_cliente' => $row['id'], 'sexo' => $row['sexo']);                               
+      $return1 = array (
+        'id' => $row['id'],
+        'nombre' => $row['nombre'],
+        'apellido' => $row['apellido'],
+        'sexo' => $row['sexo'],
+        'id_cliente' => $row['id'],
+        'sexo' => $row['sexo']
+      );         
   }
 }
 $id_tabla_cliente = $return1['id_cliente'];
-$sexo=$return1['sexo'];
+$nombre = $return1['nombre'];
+$apellido = $return1['apellido'];
+$sexo = $return1['sexo'];
+$id_tabla_cliente = $return1['id'];
 
 $_SESSION['carnet_identidad']=$carnet_identidad;
 $_SESSION['nombre']=$nombre;
